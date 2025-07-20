@@ -60,19 +60,6 @@ az deployment group create \
 
 ---
 
-## 🔧 Pipeline Features
-
-- **📅 Daily Automation:** Scheduled execution via Azure Data Factory triggers
-- **🔄 Truncate & Load:** Fresh data load pattern with table clearing
-- **📝 Dynamic Transformations:** Filename-based date extraction
-- **⚡ Parallel Processing:** Concurrent handling of all file types
-- **📊 Three Data Sources:** Customer, master-child, and e-commerce order data
-
----
-
-## 📖 Technical Documentation
-
-For comprehensive technical details, refer to **`Assignment_report.docx`
 
 
 
