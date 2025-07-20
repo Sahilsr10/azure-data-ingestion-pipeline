@@ -36,6 +36,20 @@ Azure Data Lake Storage Gen2 → Azure Data Factory → Azure SQL Database
 | Child Export | `master_child_export-*.csv` | Extract date + DateKey from filename | `master_child` |
 | E-commerce Orders | `H_ECOM_ORDER.csv` | No transformation | `H_ECOM_Orders` |
 
+✨ Visualizing the Pipeline
+Here is a visual representation of the pipeline's structure and a successful execution run.
+
+1. Pipeline Canvas View
+(This shows the complete pipeline with its three parallel branches for processing each file type.)
+
+<img width="1664" height="829" alt="Screenshot 2025-07-20 at 11 11 07 PM" src="https://github.com/user-attachments/assets/404ed225-d652-4c4d-8b54-bc6d272c3443" />
+
+2. Successful Pipeline Run
+(This demonstrates a successful debug or triggered run from the Azure Data Factory monitoring view.)
+
+<img width="1658" height="770" alt="Screenshot 2025-07-20 at 11 11 58 PM" src="https://github.com/user-attachments/assets/8ea95e65-6d60-4a99-93e8-f6784486a830" />
+
+
 ## 🚀 Key Features
 
 - ✅ **Fully Automated**: Zero manual intervention required
