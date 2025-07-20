@@ -8,6 +8,66 @@ Automated Azure Data Factory pipeline to ingest, transform, and load daily CSV f
 
 A robust, scalable, and fully automated ETL pipeline built on Microsoft Azure services for daily data ingestion from multiple CSV sources into Azure SQL Database.
 
+🗂️ Repository Contents
+📁 Core Files
+
+ARMTemplateForFactory.json - Azure Resource Manager template for deploying the Data Factory infrastructure
+ARMTemplateParametersForFactory.json - Parameters file for the ARM template deployment
+Assignment_report.docx - Complete project documentation and technical report
+
+📊 Sample Data Files
+The repository includes sample CSV files that demonstrate the expected data formats and naming conventions:
+
+CUST_MSTR_20191112.csv - Sample customer master data file
+
+Format: CUST_MSTR_YYYYMMDD.csv
+Transformation: Date column extracted from filename (2019-11-12)
+
+
+master_child_export-20191112.csv - Sample master-child export data
+
+Format: master_child_export-YYYYMMDD.csv
+Transformations:
+
+Date column: 2019-11-12
+DateKey column: 20191112
+
+
+
+
+H_ECOM_ORDER.csv - Sample e-commerce order data
+
+Format: H_ECOM_ORDER.csv
+Transformation: Loaded as-is with no modifications
+
+
+
+🚀 Quick Start
+
+Deploy Infrastructure:
+bash# Deploy using ARM template
+az deployment group create \
+  --resource-group your-rg-name \
+  --template-file ARMTemplateForFactory.json \
+  --parameters @ARMTemplateParametersForFactory.json
+
+Upload Sample Data:
+
+Upload the sample CSV files to your Azure Data Lake Storage container
+Ensure the files follow the naming conventions shown above
+
+
+Configure Pipeline:
+
+Import the Data Factory pipeline from the ARM template
+Update connection strings and storage account details
+Set up the daily trigger schedule
+
+
+
+📖 Documentation
+Refer to Assignment_report.docx for detailed technical documentation including:
+
 ## 🏗️ Architecture Overview
 
 ```
