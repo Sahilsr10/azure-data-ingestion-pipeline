@@ -166,9 +166,7 @@ az sql db create \
 ## 📈 Performance & Monitoring
 
 ### Key Metrics
-- **Processing Time**: < 30 minutes for typical daily volumes
-- **Success Rate**: 99%+ pipeline execution success
-- **Data Freshness**: Daily updates guaranteed by 6 AM
+- **Processing Time**: < 30 minutes for typical daily volumes 
 - **Resource Utilization**: Optimized for cost-effective serverless execution
 
 ### Monitoring Dashboard
@@ -196,25 +194,6 @@ Ensure source files follow these patterns:
 - Child Export: `master_child_export-YYYYMMDD.csv`
 - E-commerce: `H_ECOM_ORDER.csv`
 
-## 🚨 Troubleshooting
-
-### Common Issues
-
-**Pipeline Fails to Start**
-- Verify trigger is enabled and properly configured
-- Check linked service connections
-- Confirm file permissions in Data Lake
-
-**Transformation Errors**
-- Validate filename patterns match expected format
-- Check for special characters in filenames
-- Verify CSV file structure matches expected schema
-
-**SQL Loading Failures**
-- Confirm target tables exist with correct schema
-- Check SQL Database connection and credentials
-- Verify sufficient database storage space
-
 For detailed troubleshooting, see [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 ## 📚 Documentation
@@ -241,13 +220,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Azure community for best practices and examples
 - Project stakeholders for requirements and testing support
 
-## 📞 Support
 
-For questions or support:
-- 📧 Email: [your-email@company.com]
-- 📖 Documentation: [Internal Wiki Link]
-- 🐛 Issues: [GitHub Issues](https://github.com/yourusername/azure-data-pipeline/issues)
-
----
 
 **Built with ❤️ using Microsoft Azure**
