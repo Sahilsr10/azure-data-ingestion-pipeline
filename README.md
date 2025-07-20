@@ -8,65 +8,73 @@ Automated Azure Data Factory pipeline to ingest, transform, and load daily CSV f
 
 A robust, scalable, and fully automated ETL pipeline built on Microsoft Azure services for daily data ingestion from multiple CSV sources into Azure SQL Database.
 
-🗂️ Repository Contents
-📁 Core Files
+# Azure Data Ingestion Pipeline
 
-ARMTemplateForFactory.json - Azure Resource Manager template for deploying the Data Factory infrastructure
-ARMTemplateParametersForFactory.json - Parameters file for the ARM template deployment
-Assignment_report.docx - Complete project documentation and technical report
+## 🎯 Project Overview
+This repository contains the complete implementation of an automated daily data ingestion pipeline using Microsoft Azure services. The solution orchestrates the ingestion of three distinct types of CSV files from Azure Data Lake into a structured Azure SQL Database.
 
-📊 Sample Data Files
-The repository includes sample CSV files that demonstrate the expected data formats and naming conventions:
+---
 
-CUST_MSTR_20191112.csv - Sample customer master data file
+## 📂 Repository Structure
 
-Format: CUST_MSTR_YYYYMMDD.csv
-Transformation: Date column extracted from filename (2019-11-12)
+### 🏗️ Infrastructure Files
+| File | Description |
+|------|-------------|
+| `ARMTemplateForFactory.json` | Azure Resource Manager template for Data Factory deployment |
+| `ARMTemplateParametersForFactory.json` | Configuration parameters for ARM template |
 
+### 📊 Sample Data Files
+| File | Format | Transformations Applied |
+|------|--------|------------------------|
+| `CUST_MSTR_20191112.csv` | `CUST_MSTR_YYYYMMDD.csv` | ✅ Date column extracted: `2019-11-12` |
+| `master_child_export-20191112.csv` | `master_child_export-YYYYMMDD.csv` | ✅ Date: `2019-11-12`<br>✅ DateKey: `20191112` |
+| `H_ECOM_ORDER.csv` | `H_ECOM_ORDER.csv` | ❌ No transformations (loaded as-is) |
 
-master_child_export-20191112.csv - Sample master-child export data
+### 📋 Documentation
+| File | Content |
+|------|---------|
+| `Assignment_report.docx` | Complete technical documentation, architecture design, and implementation details |
 
-Format: master_child_export-YYYYMMDD.csv
-Transformations:
+---
 
-Date column: 2019-11-12
-DateKey column: 20191112
+## 🚀 Quick Deployment
 
-
-
-
-H_ECOM_ORDER.csv - Sample e-commerce order data
-
-Format: H_ECOM_ORDER.csv
-Transformation: Loaded as-is with no modifications
-
-
-
-🚀 Quick Start
-
-Deploy Infrastructure:
-bash# Deploy using ARM template
+### Step 1: Deploy Infrastructure
+```bash
 az deployment group create \
-  --resource-group your-rg-name \
+  --resource-group <your-resource-group> \
   --template-file ARMTemplateForFactory.json \
   --parameters @ARMTemplateParametersForFactory.json
+```
 
-Upload Sample Data:
+### Step 2: Upload Sample Data
+```bash
+# Upload CSV files to your Azure Data Lake Storage container
+# Ensure naming conventions match the patterns above
+```
 
-Upload the sample CSV files to your Azure Data Lake Storage container
-Ensure the files follow the naming conventions shown above
+### Step 3: Configure Pipeline
+1. Import Data Factory pipeline from ARM template
+2. Update connection strings and storage details
+3. Activate the daily trigger schedule
+
+---
+
+## 🔧 Pipeline Features
+
+- **📅 Daily Automation:** Scheduled execution via Azure Data Factory triggers
+- **🔄 Truncate & Load:** Fresh data load pattern with table clearing
+- **📝 Dynamic Transformations:** Filename-based date extraction
+- **⚡ Parallel Processing:** Concurrent handling of all file types
+- **📊 Three Data Sources:** Customer, master-child, and e-commerce order data
+
+---
+
+## 📖 Technical Documentation
+
+For comprehensive technical details, refer to **`Assignment_report.docx`
 
 
-Configure Pipeline:
-
-Import the Data Factory pipeline from the ARM template
-Update connection strings and storage account details
-Set up the daily trigger schedule
-
-
-
-📖 Documentation
-Refer to Assignment_report.docx for detailed technical documentation including:
 
 ## 🏗️ Architecture Overview
 
