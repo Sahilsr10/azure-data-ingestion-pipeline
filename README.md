@@ -214,11 +214,6 @@ For detailed troubleshooting, see [TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md)
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🏆 Acknowledgments
-
-- Microsoft Azure Data Factory team for excellent documentation
-- Azure community for best practices and examples
-- Project stakeholders for requirements and testing support
 
 
 
