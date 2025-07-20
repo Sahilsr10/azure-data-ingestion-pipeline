@@ -1,0 +1,3 @@
+OrderID,CustomerID,ProductName,OrderDate
+1,101,Laptop,2019-11-12
+2,102,Mouse,2019-11-12

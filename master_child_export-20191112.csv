@@ -1,0 +1,7 @@
+master_account_id,child_account_id,relationship_type,status,date_linked
+101,102,Spouse,Active,2018-05-20
+101,103,Child,Active,2018-05-21
+205,206,Authorized User,Active,2019-01-15
+410,411,Spouse,Inactive,2017-11-30
+410,412,Child,Active,2017-12-01
+552,553,Family,Active,2019-08-09
