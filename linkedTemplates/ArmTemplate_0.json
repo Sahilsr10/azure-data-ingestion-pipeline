@@ -1,0 +1,938 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name",
+            "defaultValue": "rg-internship-project"
+        },
+        "LS_DataLake_accountKey": {
+            "type": "secureString",
+            "metadata": "Secure string for 'accountKey' of 'LS_DataLake'"
+        },
+        "LS_SQLDatabase_password": {
+            "type": "secureString",
+            "metadata": "Secure string for 'password' of 'LS_SQLDatabase'"
+        },
+        "LS_DataLake_properties_typeProperties_url": {
+            "type": "string",
+            "defaultValue": "https://sahiladfdatalake.dfs.core.windows.net/"
+        },
+        "LS_SQLDatabase_properties_typeProperties_server": {
+            "type": "string",
+            "defaultValue": "sahilad.database.windows.net"
+        },
+        "LS_SQLDatabase_properties_typeProperties_database": {
+            "type": "string",
+            "defaultValue": "deltadata"
+        },
+        "LS_SQLDatabase_properties_typeProperties_userName": {
+            "type": "string",
+            "defaultValue": "sahil"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/LS_DataLake')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureBlobFS",
+                "typeProperties": {
+                    "url": "[parameters('LS_DataLake_properties_typeProperties_url')]",
+                    "accountKey": {
+                        "type": "SecureString",
+                        "value": "[parameters('LS_DataLake_accountKey')]"
+                    }
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/LS_SQLDatabase')]",
+            "type": "Microsoft.DataFactory/factories/linkedServices",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "annotations": [],
+                "type": "AzureSqlDatabase",
+                "typeProperties": {
+                    "server": "[parameters('LS_SQLDatabase_properties_typeProperties_server')]",
+                    "database": "[parameters('LS_SQLDatabase_properties_typeProperties_database')]",
+                    "encrypt": "mandatory",
+                    "trustServerCertificate": false,
+                    "authenticationType": "SQL",
+                    "userName": "[parameters('LS_SQLDatabase_properties_typeProperties_userName')]",
+                    "password": {
+                        "type": "SecureString",
+                        "value": "[parameters('LS_SQLDatabase_password')]"
+                    }
+                }
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_CUST_MSTR')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_DataLake",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "folderPath": "CUST_MSTR",
+                        "fileSystem": "raw-data"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_DataLake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_master_child_export')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_DataLake",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": "master_child_export-20191112.csv",
+                        "folderPath": "master_child_export",
+                        "fileSystem": "raw-data"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_DataLake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_H_ECOM_ORDER')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_DataLake",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobFSLocation",
+                        "fileName": "H_ECOM_ORDER.csv",
+                        "folderPath": "H_ECOM_ORDER/H_ECOM_ORDER",
+                        "fileSystem": "raw-data"
+                    },
+                    "columnDelimiter": ",",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_DataLake')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_CUST_MSTR_Table')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_SQLDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "CustomerID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "CustomerName",
+                        "type": "varchar"
+                    },
+                    {
+                        "name": "Email",
+                        "type": "varchar"
+                    },
+                    {
+                        "name": "Phone",
+                        "type": "varchar"
+                    },
+                    {
+                        "name": "LoadDate",
+                        "type": "date"
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "CUST_MSTR"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_master_child_Table')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_SQLDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "MasterID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "ChildID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "ProductName",
+                        "type": "varchar"
+                    },
+                    {
+                        "name": "Category",
+                        "type": "varchar"
+                    },
+                    {
+                        "name": "Date",
+                        "type": "date"
+                    },
+                    {
+                        "name": "DateKey",
+                        "type": "int",
+                        "precision": 10
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "master_child"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DS_H_ECOM_Orders_Table')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "LS_SQLDatabase",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "AzureSqlTable",
+                "schema": [
+                    {
+                        "name": "OrderID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "CustomerID",
+                        "type": "int",
+                        "precision": 10
+                    },
+                    {
+                        "name": "ProductName",
+                        "type": "varchar"
+                    },
+                    {
+                        "name": "OrderDate",
+                        "type": "date"
+                    },
+                    {
+                        "name": "Amount",
+                        "type": "decimal",
+                        "precision": 10,
+                        "scale": 2
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "H_ECOM_Orders"
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/linkedServices/LS_SQLDatabase')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/Daily_File_Load')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "activities": [
+                    {
+                        "name": "Get_File_List",
+                        "type": "GetMetadata",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "typeProperties": {
+                            "dataset": {
+                                "referenceName": "DS_CUST_MSTR",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            },
+                            "fieldList": [
+                                "childItems"
+                            ],
+                            "storeSettings": {
+                                "type": "AzureBlobFSReadSettings",
+                                "enablePartitionDiscovery": false
+                            },
+                            "formatSettings": {
+                                "type": "DelimitedTextReadSettings"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Filter_CUST_MSTR",
+                        "type": "Filter",
+                        "dependsOn": [
+                            {
+                                "activity": "Get_File_List",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('Get_File_List').output.childItems",
+                                "type": "Expression"
+                            },
+                            "condition": {
+                                "value": "@startswith(item().name, 'CUST_MSTR')",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Truncate_CUST_MSTR",
+                        "type": "Script",
+                        "dependsOn": [
+                            {
+                                "activity": "Filter_CUST_MSTR",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "linkedServiceName": {
+                            "referenceName": "LS_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        },
+                        "typeProperties": {
+                            "scripts": [
+                                {
+                                    "type": "Query",
+                                    "text": "TRUNCATE TABLE dbo.CUST_MSTR"
+                                }
+                            ],
+                            "scriptBlockExecutionTimeout": "02:00:00"
+                        }
+                    },
+                    {
+                        "name": "ForEach_CUST_MSTR",
+                        "type": "ForEach",
+                        "dependsOn": [
+                            {
+                                "activity": "Truncate_CUST_MSTR",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('Filter_CUST_MSTR').output.value",
+                                "type": "Expression"
+                            },
+                            "activities": [
+                                {
+                                    "name": "Copy data1",
+                                    "type": "Copy",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "0.12:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "source": {
+                                            "type": "DelimitedTextSource",
+                                            "additionalColumns": [
+                                                {
+                                                    "name": "Date",
+                                                    "value": {
+                                                        "value": "@concat(substring(replace(item().name, 'CUST_MSTR_', ''), 0, 4), '-', substring(replace(item().name, 'CUST_MSTR_', ''), 4, 2), '-', substring(replace(item().name, 'CUST_MSTR_', ''), 6, 2))",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            ],
+                                            "storeSettings": {
+                                                "type": "AzureBlobFSReadSettings",
+                                                "recursive": true,
+                                                "wildcardFileName": "*@item().name",
+                                                "enablePartitionDiscovery": false
+                                            },
+                                            "formatSettings": {
+                                                "type": "DelimitedTextReadSettings"
+                                            }
+                                        },
+                                        "sink": {
+                                            "type": "AzureSqlSink",
+                                            "writeBehavior": "insert",
+                                            "sqlWriterUseTableLock": false
+                                        },
+                                        "enableStaging": false,
+                                        "translator": {
+                                            "type": "TabularTranslator",
+                                            "mappings": [
+                                                {
+                                                    "source": {
+                                                        "name": "cust_id"
+                                                    },
+                                                    "sink": {
+                                                        "name": "CustomerID",
+                                                        "type": "Int32",
+                                                        "physicalType": "int"
+                                                    }
+                                                },
+                                                {
+                                                    "source": {
+                                                        "name": "cust_name"
+                                                    },
+                                                    "sink": {
+                                                        "name": "CustomerName",
+                                                        "type": "String",
+                                                        "physicalType": "varchar"
+                                                    }
+                                                },
+                                                {
+                                                    "source": {
+                                                        "name": "Date"
+                                                    },
+                                                    "sink": {
+                                                        "name": "LoadDate",
+                                                        "type": "DateTime",
+                                                        "physicalType": "date"
+                                                    }
+                                                }
+                                            ],
+                                            "typeConversion": true,
+                                            "typeConversionSettings": {
+                                                "allowDataTruncation": true,
+                                                "treatBooleanAsNumber": false
+                                            }
+                                        }
+                                    },
+                                    "inputs": [
+                                        {
+                                            "referenceName": "DS_CUST_MSTR",
+                                            "type": "DatasetReference",
+                                            "parameters": {}
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "referenceName": "DS_CUST_MSTR_Table",
+                                            "type": "DatasetReference",
+                                            "parameters": {}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Filter_master_child",
+                        "type": "Filter",
+                        "dependsOn": [
+                            {
+                                "activity": "Get_File_List",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('Get_File_List').output.childItems",
+                                "type": "Expression"
+                            },
+                            "condition": {
+                                "value": "@startswith(item().name, 'master_child_export')",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Truncate_master_child",
+                        "type": "Script",
+                        "dependsOn": [
+                            {
+                                "activity": "Filter_master_child",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "linkedServiceName": {
+                            "referenceName": "LS_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        },
+                        "typeProperties": {
+                            "scripts": [
+                                {
+                                    "type": "Query",
+                                    "text": "TRUNCATE TABLE dbo.master_child"
+                                }
+                            ],
+                            "scriptBlockExecutionTimeout": "02:00:00"
+                        }
+                    },
+                    {
+                        "name": "ForEach_master_child",
+                        "type": "ForEach",
+                        "dependsOn": [
+                            {
+                                "activity": "Truncate_master_child",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('Filter_master_child').output.value",
+                                "type": "Expression"
+                            },
+                            "activities": [
+                                {
+                                    "name": "Copy data2",
+                                    "type": "Copy",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "0.12:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "source": {
+                                            "type": "DelimitedTextSource",
+                                            "additionalColumns": [
+                                                {
+                                                    "name": "date",
+                                                    "value": {
+                                                        "value": "@concat(substring(replace(replace(item().name, 'master_child_export-', ''), '.csv', ''), 0, 4), '-', substring(replace(replace(item().name, 'master_child_export-', ''), '.csv', ''), 4, 2), '-', substring(replace(replace(item().name, 'master_child_export-', ''), '.csv', ''), 6, 2))",
+                                                        "type": "Expression"
+                                                    }
+                                                },
+                                                {
+                                                    "name": "DateKey",
+                                                    "value": {
+                                                        "value": "@replace(replace(item().name, 'master_child_export-', ''), '.csv', '')",
+                                                        "type": "Expression"
+                                                    }
+                                                }
+                                            ],
+                                            "storeSettings": {
+                                                "type": "AzureBlobFSReadSettings",
+                                                "recursive": true,
+                                                "wildcardFileName": "@item().name",
+                                                "enablePartitionDiscovery": false
+                                            },
+                                            "formatSettings": {
+                                                "type": "DelimitedTextReadSettings"
+                                            }
+                                        },
+                                        "sink": {
+                                            "type": "AzureSqlSink",
+                                            "writeBehavior": "insert",
+                                            "sqlWriterUseTableLock": false
+                                        },
+                                        "enableStaging": false,
+                                        "translator": {
+                                            "type": "TabularTranslator",
+                                            "mappings": [
+                                                {
+                                                    "source": {
+                                                        "name": "master_account_id",
+                                                        "type": "String",
+                                                        "physicalType": "String"
+                                                    },
+                                                    "sink": {
+                                                        "name": "MasterID",
+                                                        "type": "Int32",
+                                                        "physicalType": "int"
+                                                    }
+                                                },
+                                                {
+                                                    "source": {
+                                                        "name": "child_account_id",
+                                                        "type": "String",
+                                                        "physicalType": "String"
+                                                    },
+                                                    "sink": {
+                                                        "name": "ChildID",
+                                                        "type": "Int32",
+                                                        "physicalType": "int"
+                                                    }
+                                                },
+                                                {
+                                                    "source": {
+                                                        "name": "date",
+                                                        "type": "String"
+                                                    },
+                                                    "sink": {
+                                                        "name": "Date",
+                                                        "type": "DateTime",
+                                                        "physicalType": "date"
+                                                    }
+                                                },
+                                                {
+                                                    "source": {
+                                                        "name": "DateKey",
+                                                        "type": "String"
+                                                    },
+                                                    "sink": {
+                                                        "name": "DateKey",
+                                                        "type": "Int32",
+                                                        "physicalType": "int"
+                                                    }
+                                                }
+                                            ],
+                                            "typeConversion": true,
+                                            "typeConversionSettings": {
+                                                "allowDataTruncation": true,
+                                                "treatBooleanAsNumber": false
+                                            }
+                                        }
+                                    },
+                                    "inputs": [
+                                        {
+                                            "referenceName": "DS_master_child_export",
+                                            "type": "DatasetReference",
+                                            "parameters": {}
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "referenceName": "DS_master_child_Table",
+                                            "type": "DatasetReference",
+                                            "parameters": {}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    {
+                        "name": "Filter_H_ECOM",
+                        "type": "Filter",
+                        "dependsOn": [
+                            {
+                                "activity": "Get_File_List",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('Get_File_List').output.childItems",
+                                "type": "Expression"
+                            },
+                            "condition": {
+                                "value": "@startswith(item().name, 'H_ECOM_ORDER')",
+                                "type": "Expression"
+                            }
+                        }
+                    },
+                    {
+                        "name": "Truncate_H_ECOM_Orders",
+                        "type": "Script",
+                        "dependsOn": [
+                            {
+                                "activity": "Filter_H_ECOM",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "policy": {
+                            "timeout": "0.12:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [],
+                        "linkedServiceName": {
+                            "referenceName": "LS_SQLDatabase",
+                            "type": "LinkedServiceReference"
+                        },
+                        "typeProperties": {
+                            "scripts": [
+                                {
+                                    "type": "Query",
+                                    "text": "TRUNCATE TABLE dbo.H_ECOM_Orders"
+                                }
+                            ],
+                            "scriptBlockExecutionTimeout": "02:00:00"
+                        }
+                    },
+                    {
+                        "name": "ForEach_H_ECOM",
+                        "type": "ForEach",
+                        "dependsOn": [
+                            {
+                                "activity": "Truncate_H_ECOM_Orders",
+                                "dependencyConditions": [
+                                    "Succeeded"
+                                ]
+                            }
+                        ],
+                        "userProperties": [],
+                        "typeProperties": {
+                            "items": {
+                                "value": "@activity('Filter_H_ECOM').output.value",
+                                "type": "Expression"
+                            },
+                            "activities": [
+                                {
+                                    "name": "Copy data3",
+                                    "type": "Copy",
+                                    "dependsOn": [],
+                                    "policy": {
+                                        "timeout": "0.12:00:00",
+                                        "retry": 0,
+                                        "retryIntervalInSeconds": 30,
+                                        "secureOutput": false,
+                                        "secureInput": false
+                                    },
+                                    "userProperties": [],
+                                    "typeProperties": {
+                                        "source": {
+                                            "type": "DelimitedTextSource",
+                                            "storeSettings": {
+                                                "type": "AzureBlobFSReadSettings",
+                                                "recursive": true,
+                                                "wildcardFileName": "@item().name",
+                                                "enablePartitionDiscovery": false
+                                            },
+                                            "formatSettings": {
+                                                "type": "DelimitedTextReadSettings"
+                                            }
+                                        },
+                                        "sink": {
+                                            "type": "AzureSqlSink",
+                                            "writeBehavior": "insert",
+                                            "sqlWriterUseTableLock": false
+                                        },
+                                        "enableStaging": false,
+                                        "translator": {
+                                            "type": "TabularTranslator",
+                                            "mappings": [
+                                                {
+                                                    "source": {
+                                                        "name": "OrderID",
+                                                        "type": "String",
+                                                        "physicalType": "String"
+                                                    },
+                                                    "sink": {
+                                                        "name": "OrderID",
+                                                        "type": "Int32",
+                                                        "physicalType": "int"
+                                                    }
+                                                },
+                                                {
+                                                    "source": {
+                                                        "name": "CustomerID",
+                                                        "type": "String",
+                                                        "physicalType": "String"
+                                                    },
+                                                    "sink": {
+                                                        "name": "CustomerID",
+                                                        "type": "Int32",
+                                                        "physicalType": "int"
+                                                    }
+                                                },
+                                                {
+                                                    "source": {
+                                                        "name": "ProductName",
+                                                        "type": "String",
+                                                        "physicalType": "String"
+                                                    },
+                                                    "sink": {
+                                                        "name": "ProductName",
+                                                        "type": "String",
+                                                        "physicalType": "varchar"
+                                                    }
+                                                },
+                                                {
+                                                    "source": {
+                                                        "name": "OrderDate",
+                                                        "type": "String",
+                                                        "physicalType": "String"
+                                                    },
+                                                    "sink": {
+                                                        "name": "OrderDate",
+                                                        "type": "DateTime",
+                                                        "physicalType": "date"
+                                                    }
+                                                }
+                                            ],
+                                            "typeConversion": true,
+                                            "typeConversionSettings": {
+                                                "allowDataTruncation": true,
+                                                "treatBooleanAsNumber": false
+                                            }
+                                        }
+                                    },
+                                    "inputs": [
+                                        {
+                                            "referenceName": "DS_H_ECOM_ORDER",
+                                            "type": "DatasetReference",
+                                            "parameters": {}
+                                        }
+                                    ],
+                                    "outputs": [
+                                        {
+                                            "referenceName": "DS_H_ECOM_Orders_Table",
+                                            "type": "DatasetReference",
+                                            "parameters": {}
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "policy": {
+                    "elapsedTimeMetric": {}
+                },
+                "annotations": []
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/DS_CUST_MSTR')]",
+                "[concat(variables('factoryId'), '/linkedServices/LS_SQLDatabase')]",
+                "[concat(variables('factoryId'), '/datasets/DS_CUST_MSTR_Table')]",
+                "[concat(variables('factoryId'), '/datasets/DS_master_child_export')]",
+                "[concat(variables('factoryId'), '/datasets/DS_master_child_Table')]",
+                "[concat(variables('factoryId'), '/datasets/DS_H_ECOM_ORDER')]",
+                "[concat(variables('factoryId'), '/datasets/DS_H_ECOM_Orders_Table')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/Trigger_Daily_File_Load')]",
+            "type": "Microsoft.DataFactory/factories/triggers",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "description": "Daily trigger to run the file processing and loading pipeline.",
+                "annotations": [],
+                "runtimeState": "Started",
+                "pipelines": [
+                    {
+                        "pipelineReference": {
+                            "referenceName": "Daily_File_Load",
+                            "type": "PipelineReference"
+                        },
+                        "parameters": {}
+                    }
+                ],
+                "type": "ScheduleTrigger",
+                "typeProperties": {
+                    "recurrence": {
+                        "frequency": "Day",
+                        "interval": 1,
+                        "startTime": "2025-07-21T16:49:00",
+                        "timeZone": "India Standard Time",
+                        "schedule": {}
+                    }
+                }
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/pipelines/Daily_File_Load')]"
+            ]
+        }
+    ]
+}
